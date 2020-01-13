@@ -21,13 +21,10 @@ def novel_dict(source, book, string):
 	}
 	return scribbleDict
 
-#Create Files
-def novel_book(toc, title, author):
+
+def relib(toc):
 
     thisdict = {}
-
-    with open('book.txt', 'w', encoding='utf-8') as outp:
-            outp.close()
 
     for a in BeautifulSoup(requests.get(toc).text, 'html5lib').find_all('li', class_=lambda value: value and value.startswith("page_item page-item-")):
         thisdict[a.a.text] = a.a['href']
@@ -64,12 +61,68 @@ def novel_book(toc, title, author):
 
         print(' ' + chapter)
 
+def yurika(toc):
+
+    thisdict = {}
+
+    for a in BeautifulSoup(requests.get(toc).text, 'html5lib').find_all('tr'):
+        thisdict[a.td.a.text] = a.td.a['href']
+
+    #for chapter, url in natsorted(thisdict.items()):
+    for chapter, url in thisdict.items():
+        
+        soup = BeautifulSoup(requests.get(url).text, 'html5lib')
+
+        soup_find = soup.find('div', class_="post-single-content box mark-links")
+
+        for div in soup_find.find_all('span', class_=lambda value: value and value.startswith("ezoic")): 
+            div.decompose()
+
+        for div in soup_find.find_all('div', class_="adboxarea"): 
+            div.decompose()
+
+        for div in soup_find.find_all(id="quarts"): 
+            div.decompose()
+
+        for div in soup_find.find_all('div', class_="tags"): 
+            div.decompose()
+
+        for div in soup_find.find_all('div', class_=lambda value: value and value.startswith("wpnm-button")): 
+            div.decompose()
+
+        for div in soup_find.find_all('br'): 
+            div.decompose()
+
+        content = str(soup_find)
+
+        regfix = content.replace('	</div>', '').replace('<hr/>', '').replace('<div class="post-single-content box mark-links" id="content">	', '')
+
+        clean = re.sub('(<!--)(.*?)(-->)', '', regfix)
+
+        with open("book.txt", 'a', encoding='utf-8') as outp:
+            outp.write("# " + chapter + "\n")
+            outp.write(clean)
+            outp.write('\n')             
+        outp.close()
+
+        print(' ' + chapter)
+
+
+#Create Files
+def novel_book(source, toc, title, author):
+
+    with open('book.txt', 'w', encoding='utf-8') as outp:
+            outp.close()
+
+    if source == 'relibrary':
+        relib(toc)
+    
+    if source == 'yurikatrans':
+        yurika(toc)
+
     os.system('pandoc book.txt metadata.txt -s -o ' + '"' + title.replace('?','').replace(':','') + " - " + author + '.epub"')
     os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Novel Updates"')
     os.remove("metadata.txt")
     os.remove("image.png")
     os.remove("book.txt")
     os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
-
-
-#novel_book('https://re-library.com/translations/succubus-sans-life-in-another-world/', 'Succubus-san’s Life in Another World', "Kashiwagi Masato")

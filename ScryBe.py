@@ -28,7 +28,7 @@ def check_update(url, source, book, new):
 	source = source_dict(source, url, 'source')
 	book = source_dict(source, url, 'book')
 	author = source_dict(source, url, 'author')
-	title = source_dict(source, url, 'title').replace('’', "'").replace('â€™','’')
+	title = source_dict(source, url, 'title').replace('’', "'").replace('â€™',"'")
 	toc = source_dict(source, url, 'toc')
 	image = source_dict(source, url, 'image')
 	chapter = source_dict(source, url, 'chapter')
@@ -40,7 +40,7 @@ def check_update(url, source, book, new):
 			if source == 'Scribble Hub':
 				scribble_book(url, title, author)
 			else:
-				novel_book(toc, title, author)
+				novel_book(source, toc, title, author)
 			edit_json(source, book, 'chapter', new)
 			phone_alert(title, new, url, 'epub_created')
 			#phone_alert(title, new, image, 'epub_wear')
@@ -78,7 +78,7 @@ while True:
 		source = description[0].strip('()')
 		url = description[-1]
 		print(source + ' - ' + new)
-		if source == 'Re:Library':
+		if source == 'Re:Library' or source == 'yurikatrans':
 			#print(json_value(source, url, 'toc'))
 			check_update(url, source, url, BeautifulSoup(requests.get(url).text, 'html5lib').find('a', class_="chp-release").text)
 
