@@ -1,0 +1,61 @@
+@page {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+}
+body {
+  padding: 0;
+}
+h2 {
+  padding-top: 0;
+  display: block;
+  text-align: left;
+}
+h3 {
+  display: block;
+  text-align: left;
+}
+p {
+  text-indent: 1em;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  text-align: justify;
+}
+p .imgBig {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-indent: 0;
+}
+p .imgBig img {
+  margin-bottom: 5px;
+  max-width: 100%;
+}
+p .imgSmall img {
+  display: inline-block;
+  max-width: 100%;
+}
+div {
+  text-indent: 1em;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  text-align: justify;
+}
+table {
+  max-width: 100%;
+}
+table td {
+  vertical-align: top;
+  text-align: left;
+}
+table .row img {
+  max-width: 100px;
+  max-height: 100px;
+}
+table .rowSingleImg img {
+  max-width: 100%;
+}
+table .rowSingleImg td {
+  text-align: center;
+}
