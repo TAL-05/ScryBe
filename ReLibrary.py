@@ -67,8 +67,8 @@ def relibrary_book(url, title, author):
 
 		with open("relibrary.txt", 'r+', encoding='utf-8') as outp:
 			outp.write("\n\n# " + chapter + "\n\n")
-        	outp.write(content)
-        	outp.write('\n')
+			outp.write(content)
+			outp.write('\n')
 			outp.close()
 
 		if soup.find('a', title="Shortcut: [Ctrl] + [<-]")['href'] == '#':
