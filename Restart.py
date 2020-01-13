@@ -7,7 +7,7 @@ import os
 
 #filename = sys.argv[1]
 filename = 'ScryBe.py'
-directory = '/home/pi/Documents/ScryBe/'
+directory = '/home/pi/Documents/ScryBe2/'
 while True:
     print("\nStarting " + filename)
     p = Popen("python3 " + filename, shell=True)
