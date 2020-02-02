@@ -1,6 +1,7 @@
 import datetime
 from PIL import Image
 import requests
+import cfscrape
 import json
 import os
 
@@ -20,7 +21,7 @@ def json_value(soruce, book, key):
 	return jsonData[soruce][book][key]
 
 #Create New Json Entry ForbBook
-def create_json(soruce, book, author, title, toc, image, chapter):
+def create_json(soruce, book, author, title, toc, image, chapter, chapters):
 
 	with open('data.json') as json_file:
 		if not os.stat("data.json").st_size == 0:
@@ -32,7 +33,7 @@ def create_json(soruce, book, author, title, toc, image, chapter):
 		info = {}
 
 	if toc not in info.keys():
-		content = {'author' : author, 'title' : title, 'toc' : toc, 'image' : image, 'chapter' : chapter}
+		content = {'author' : author, 'title' : title, 'toc' : toc, 'image' : image, 'chapter' : chapter, 'chapters' : chapters}
 		info[book] = content
 		jsonData[soruce] = info
 
@@ -50,6 +51,7 @@ def phone_alert(first, second, third, trigger):
 
 #Create Metadata and Image
 def create_metadata(source, title, author, url, image):
+	scraper = cfscrape.create_scraper()
 	
 	with open('metadata.txt', 'w', encoding='utf-8') as outp:
 		outp.write("---\n")
@@ -65,4 +67,4 @@ def create_metadata(source, title, author, url, image):
 		outp.write("stylesheet: style.css\n")
 		outp.write("...\n")
 	outp.close()
-	Image.open(requests.get(image, stream = True).raw).save('image.png')
+	Image.open(scraper.get(image, stream = True).raw).save('image.png')

@@ -1,9 +1,12 @@
 from bs4 import BeautifulSoup
 from PIL import Image
+import cfscrape
 import os
 import datetime
 import requests
 import re
+
+scraper = cfscrape.create_scraper()
 
 #Get Book Information
 def scribble_dict(url):
@@ -61,7 +64,7 @@ def scribble_book(url, title, author):
 		soup = BeautifulSoup(requests.get(soup.find('a', class_="btn-wi btn-prev")['href']).text, 'html5lib')
 
 	os.system('pandoc book.txt metadata.txt -s -o ' + '"' + title.replace('?','').replace(':','') + " - " + author + '.epub"')
-	os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Scribble Hub"')
+	#os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Scribble Hub"')
 	os.remove("metadata.txt")
 	os.remove("image.png")
 	os.remove("book.txt")
