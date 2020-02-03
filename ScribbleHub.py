@@ -1,16 +1,16 @@
 from bs4 import BeautifulSoup
 from PIL import Image
-import cfscrape
+import cloudscraper
 import os
 import datetime
 import requests
 import re
 
-scraper = cfscrape.create_scraper()
+scraper = cloudscraper.create_scraper()
 
 #Get Book Information
 def scribble_dict(url):
-	soup = BeautifulSoup(requests.get(url).text, 'html5lib')
+	soup = BeautifulSoup(scraper.get(url).text, 'html5lib')
 	scribbleDict = {
 	'source' : 'Scribble Hub',
 	'book' : re.findall('\d+', url)[0],
@@ -30,7 +30,7 @@ def decompose(tag, string, site):
 def scribble_book(url, title, author):
 	with open('book.txt', 'w', encoding='utf-8') as outp:
 			outp.close()
-	soup = BeautifulSoup(requests.get(BeautifulSoup(requests.get(url).text, 'html5lib').find('a', class_="toc_a")['href']).text, 'html5lib')
+	soup = BeautifulSoup(scraper.get(BeautifulSoup(scraper.get(url).text, 'html5lib').find('a', class_="toc_a")['href']).text, 'html5lib')
 	#return soup
 	while True:
 
@@ -61,13 +61,13 @@ def scribble_book(url, title, author):
 		if soup.find('a', title="Shortcut: [Ctrl] + [<-]")['href'] == '#':
 			break
 
-		soup = BeautifulSoup(requests.get(soup.find('a', class_="btn-wi btn-prev")['href']).text, 'html5lib')
+		soup = BeautifulSoup(scraper.get(soup.find('a', class_="btn-wi btn-prev")['href']).text, 'html5lib')
 
 	os.system('pandoc book.txt metadata.txt -s -o ' + '"' + title.replace('?','').replace(':','') + " - " + author + '.epub"')
-	#os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Scribble Hub"')
+	os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Scribble Hub"')
 	os.remove("metadata.txt")
 	os.remove("image.png")
 	os.remove("book.txt")
 	os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
 
-	return BeautifulSoup(requests.get(url).text, 'html5lib').find('a', class_="toc_a")['href']
+	return BeautifulSoup(scraper.get(url).text, 'html5lib').find('a', class_="toc_a")['href']

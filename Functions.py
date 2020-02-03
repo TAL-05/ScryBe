@@ -1,7 +1,7 @@
 import datetime
 from PIL import Image
 import requests
-import cfscrape
+import cloudscraper
 import json
 import os
 
@@ -51,7 +51,7 @@ def phone_alert(first, second, third, trigger):
 
 #Create Metadata and Image
 def create_metadata(source, title, author, url, image):
-	scraper = cfscrape.create_scraper()
+	scraper = cloudscraper.create_scraper()
 	
 	with open('metadata.txt', 'w', encoding='utf-8') as outp:
 		outp.write("---\n")

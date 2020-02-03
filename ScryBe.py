@@ -4,7 +4,7 @@ from Functions import edit_json, create_json, json_value, phone_alert, create_me
 from ScribbleHub import scribble_dict, scribble_book
 from NovelUpdates import novel_book, novel_dict
 from bs4 import BeautifulSoup
-import cfscrape
+import cloudscraper
 import time
 import feedparser
 import requests
@@ -66,11 +66,11 @@ NovelUpdates = feedparser.parse("https://www.novelupdates.com/rss.php?uid=179259
 
 while True:
 
-	scraper = cfscrape.create_scraper()
+	scraper = cloudscraper.create_scraper()
 	
-	for article in range(0,0): 
+	for article in range(0,25): 
+		#print(BeautifulSoup(requests.get(ScribbleHub.entries[article].link).text, 'html5lib'))
 		url = BeautifulSoup(scraper.get(ScribbleHub.entries[article].link).text, 'html5lib').find('div', class_='chp_byauthor').find('a')['href']
-		print("start")
 		new = BeautifulSoup(scraper.get(url).text, 'html5lib').find('li', title='Bookmark Chapter').find('a').text
 		book = re.findall('\d+', url)[0]
 		print(ScribbleHub.entries[article]['category']+': ' + new)

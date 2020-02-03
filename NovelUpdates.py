@@ -3,7 +3,7 @@ from Functions import json_value, edit_json, create_metadata
 from PIL import Image
 from natsort import natsorted
 from pathlib import Path
-import cfscrape
+import cloudscraper
 import os
 import datetime
 import requests
@@ -27,7 +27,7 @@ def relib(source, toc, title, book):
 
     i = 0
 
-    scraper = cfscrape.create_scraper()
+    scraper = cloudscraper.create_scraper()
 
     thisdict = {}
 
@@ -71,6 +71,9 @@ def relib(source, toc, title, book):
             outp.close()
 
             print(' ' + chapter)
+
+        else:
+            print('Chapter Exists')
         
         i += 1
 
@@ -178,6 +181,7 @@ def concatFiles(source, title):
 #Create Files
 def novel_book(source, toc, title, author, url):
 
+    print(source)
     with open('book.txt', 'w', encoding='utf-8') as outp:
             outp.close()
 
@@ -198,7 +202,12 @@ def novel_book(source, toc, title, author, url):
     os.remove("book.txt")
     os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
 
-#novel_book("mwm", "https://mwmtranslations.com/category/magical-revolution/", "The Magical Revolution of the Reincarnated Princess and the Genius Young Lady", "Kurasu Piero")
+src = "Re:Library"
+ttl = "Not Sure, But It Looks Like I Got Reincarnated in Another World"
+table = "https://re-library.com/translations/not-sure-another-world-reincarnation/"
+nu = "https://www.novelupdates.com/series/not-sure-but-it-looks-like-i-got-reincarnated-in-another-world/"
+au = "Ash"
+img = "https://re-library.com/wp-content/uploads/2019/09/another-world-reincarnation.jpg"
 
-#create_metadata("Re:Library", "Two as One Princesses", "Himezaki Shiu", "https://www.novelupdates.com/series/two-as-one-princesses/", "https://re-library.com/wp-content/uploads/2019/09/another-world-reincarnation.jpg")
-#novel_book("Re:Library", "https://re-library.com/translations/two-as-one-princesses/", "Two as One Princesses", "Himezaki Shiu", "https://www.novelupdates.com/series/two-as-one-princesses/")
+#create_metadata(src, ttl, au, nu, img)
+#novel_book(src, table, ttl, au, nu)
