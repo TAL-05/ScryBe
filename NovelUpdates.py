@@ -25,8 +25,6 @@ def novel_dict(source, book, string):
 
 def relib(source, toc, title, book):
 
-    i = 0
-
     scraper = cloudscraper.create_scraper()
 
     thisdict = {}
@@ -35,8 +33,8 @@ def relib(source, toc, title, book):
 
     for a in BeautifulSoup(scraper.get(toc).text, 'html5lib').find_all('li', class_=lambda value: value and value.startswith("page_item page-item-")):
         thisdict[a.a.text] = a.a['href']
+    
 
-    #for chapter, url in natsorted(thisdict.items()):
     for chapter, url in thisdict.items():
 
         if chapter not in json_value("Re:Library", book, 'chapters'):
@@ -74,12 +72,9 @@ def relib(source, toc, title, book):
 
         else:
             print('Chapter Exists')
-        
-        i += 1
-
-    i == 0
     concatFiles(source, title)
     edit_json("Re:Library", book, 'chapters', ', '.join(thisdict.keys()))
+    
 
 def yurika(toc):
 
@@ -180,8 +175,7 @@ def concatFiles(source, title):
 
 #Create Files
 def novel_book(source, toc, title, author, url):
-
-    print(source)
+    #print(source + toc + title + author + url)
     with open('book.txt', 'w', encoding='utf-8') as outp:
             outp.close()
 
@@ -196,11 +190,11 @@ def novel_book(source, toc, title, author, url):
 
 
     os.system('pandoc book.txt metadata.txt -s -o ' + '"' + title.replace('?','').replace(':','') + " - " + author + '.epub"')
-    os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Novel Updates"')
+    #os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Novel Updates"')
     os.remove("metadata.txt")
     os.remove("image.png")
     os.remove("book.txt")
-    os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
+    #os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
 
 src = "Re:Library"
 ttl = "Demon Sword Maiden"
