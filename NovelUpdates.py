@@ -190,11 +190,11 @@ def novel_book(source, toc, title, author, url):
 
 
     os.system('pandoc book.txt metadata.txt -s -o ' + '"' + title.replace('?','').replace(':','') + " - " + author + '.epub"')
-    #os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Novel Updates"')
+    os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Novel Updates"')
     os.remove("metadata.txt")
     os.remove("image.png")
     os.remove("book.txt")
-    #os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
+    os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
 
 src = "Re:Library"
 ttl = "Demon Sword Maiden"
