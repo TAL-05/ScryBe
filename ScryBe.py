@@ -68,7 +68,7 @@ while True:
 
 	scraper = cloudscraper.create_scraper()
 	
-	for article in range(0,25): 
+	for article in range(0,0): 
 		#print(BeautifulSoup(requests.get(ScribbleHub.entries[article].link).text, 'html5lib'))
 		url = BeautifulSoup(scraper.get(ScribbleHub.entries[article].link).text, 'html5lib').find('div', class_='chp_byauthor').find('a')['href']
 		new = BeautifulSoup(scraper.get(url).text, 'html5lib').find('li', title='Bookmark Chapter').find('a').text

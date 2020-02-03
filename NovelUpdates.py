@@ -64,7 +64,7 @@ def relib(source, toc, title, book):
 
             Path(re.sub(r"[^a-zA-Z0-9]+", '', source) + '/' + re.sub(r"[^a-zA-Z0-9]+", '', title) + '/').mkdir(parents=True, exist_ok=True)
 
-            with open(re.sub(r"[^a-zA-Z0-9]+", '', source) + '/' + re.sub(r"[^a-zA-Z0-9]+", '', title) + '/Chapter ' + str(i) + ".txt", 'w+', encoding='utf-8') as outp:
+            with open(re.sub(r"[^a-zA-Z0-9]+", '', source) + '/' + re.sub(r"[^a-zA-Z0-9]+", '', title) + '/' + re.sub(r"[^a-zA-Z0-9]+", '', chapter) + ".txt", 'w+', encoding='utf-8') as outp:
                 outp.write("# " + chapter + "\n")
                 outp.write(clean)
                 outp.write('\n')             
@@ -161,7 +161,7 @@ def mwm(toc):
         clean = re.sub('</h\d>', '\n', clean)
 
         with open("book.txt", 'a', encoding='utf-8') as outp:
-            #outp.write("# " + chapter + "\n")
+            outp.write("# " + chapter + "\n")
             outp.write(clean)
             outp.write('\n')             
         outp.close()
@@ -203,11 +203,11 @@ def novel_book(source, toc, title, author, url):
     os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
 
 src = "Re:Library"
-ttl = "Not Sure, But It Looks Like I Got Reincarnated in Another World"
-table = "https://re-library.com/translations/not-sure-another-world-reincarnation/"
-nu = "https://www.novelupdates.com/series/not-sure-but-it-looks-like-i-got-reincarnated-in-another-world/"
-au = "Ash"
-img = "https://re-library.com/wp-content/uploads/2019/09/another-world-reincarnation.jpg"
+ttl = "Demon Sword Maiden"
+table = "https://re-library.com/translations/demon-sword-maiden/"
+nu = "https://www.novelupdates.com/series/demon-sword-maiden/"
+au = "Carrot Sauce"
+img = "https://re-library.com/wp-content/uploads/2019/07/demon-sword-maiden.png"
 
 #create_metadata(src, ttl, au, nu, img)
 #novel_book(src, table, ttl, au, nu)
