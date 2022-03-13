@@ -1,41 +1,42 @@
 import datetime
 from PIL import Image
+from discord_webhook import DiscordWebhook, DiscordEmbed
 import requests
 import cloudscraper
 import json
 import os
 
 #Edit Book Json Value
-def edit_json(soruce, book, key, value):
+def edit_json(source, book, key, value):
 	with open('data.json') as json_file:
 		jsonData = json.load(json_file)
-	jsonData[soruce][book][key] = value
+	jsonData[source][book][key] = value
 	with open('data.json', 'w') as outfile:
 		json.dump(jsonData, outfile, indent=4)
 	return jsonData
 
 #Get Book Json Value From Key
-def json_value(soruce, book, key):
+def json_value():
 	with open('data.json') as json_file:
 		jsonData = json.load(json_file)
-	return jsonData[soruce][book][key]
+	return jsonData
 
 #Create New Json Entry ForbBook
-def create_json(soruce, book, author, title, toc, image, chapter, chapters):
+def create_json(source, book, author, title, toc, chapters):
 
 	with open('data.json') as json_file:
 		if not os.stat("data.json").st_size == 0:
 			jsonData = json.load(json_file)
 		else:
 			jsonData = {}
-	info = jsonData.get(soruce)
+	info = jsonData.get(source)
 	if info == None:
 		info = {}
 
 	if toc not in info.keys():
-		content = {'author' : author, 'title' : title, 'toc' : toc, 'image' : image, 'chapter' : chapter, 'chapters' : chapters}
+		content = {'author' : author, 'title' : title, 'toc' : toc, 'chapters' : chapters}
 		info[book] = content
-		jsonData[soruce] = info
+		jsonData[source] = info
 
 	with open('data.json', 'w') as fp:
 		json.dump(jsonData, fp, indent=4)
@@ -47,24 +48,14 @@ def phone_alert(first, second, third, trigger):
 	report["value1"] = first
 	report["value2"] = second
 	report["value3"] = third
-	requests.post("https://maker.ifttt.com/trigger/" + trigger + "/with/key/YYnkWBuCxN9_1QN0uPAmt", data=report)    
+	requests.post("https://maker.ifttt.com/trigger/" + trigger + "/with/key/c8iEn74t0TTTI8JGSmqES", data=report)    
 
-#Create Metadata and Image
-def create_metadata(source, title, author, url, image):
-	scraper = cloudscraper.create_scraper()
+def discord_alert(title, author, image, chapter, auth_image, auth_url, toc):
+	webhook = DiscordWebhook(url='https://discord.com/api/webhooks/951217607900557352/1kDc0xW4Rv9b9elXvht4ivMMiKh7qJQfSv8i7fl8H_5L6YYIpN93o_2PqgU84FvBy7Pb')
+	embed = DiscordEmbed(title=title, description = chapter, url = toc , color='03b2f8')
+	embed.set_author(name=author, url = auth_url, icon_url=auth_image)
+	embed.set_thumbnail(url=image)
+	embed.set_timestamp()
+	webhook.add_embed(embed)
+	response = webhook.execute()
 	
-	with open('metadata.txt', 'w', encoding='utf-8') as outp:
-		outp.write("---\n")
-		outp.write("title: "+ title.replace(':','&#58;') + "\n")
-		outp.write("author: " + author.replace(':','&#58;') + "\n")
-		outp.write("identifier:\n")
-		outp.write("- scheme: URL\n")
-		outp.write("  text: url:"+ url +"\n")
-		outp.write("publisher: " + source + "\n")
-		outp.write("date: "+ datetime.datetime.now().isoformat() +"\n")
-		outp.write("lang: en\n")
-		outp.write("cover-image: image.png\n")
-		outp.write("stylesheet: style.css\n")
-		outp.write("...\n")
-	outp.close()
-	Image.open(scraper.get(image, stream = True).raw).save('image.png')

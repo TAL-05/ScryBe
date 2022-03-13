@@ -1,73 +1,86 @@
 from bs4 import BeautifulSoup
+from Functions import edit_json
+from ebooklib import epub
 from PIL import Image
+from datetime import datetime
 import cloudscraper
-import os
-import datetime
-import requests
 import re
+import os
 
 scraper = cloudscraper.create_scraper()
 
-#Get Book Information
-def scribble_dict(url):
-	soup = BeautifulSoup(scraper.get(url).text, 'html5lib')
-	scribbleDict = {
-	'source' : 'Scribble Hub',
-	'book' : re.findall('\d+', url)[0],
-	'title' : str(soup.find('div', class_="fic_title").get_text()),
-	'author': str(soup.find('span', class_="auth_name_fic").get_text()),
-	'toc' : url,
-	'image' : soup.find('img', property="image")['src'],
-	'chapter' : soup.find('a', class_="toc_a").text
-	}
-	return scribbleDict
+css = open("style.css", "r")
+style = css.read()
+css.close()
 
-#Removes Unwanted Tags
-def decompose(tag, string, site):
-	for div in site.find_all(tag, class_=string): 
-		div.decompose()
+def scribble_book(toc, title, author, key, chapter_url, image, tags, description):
+    book = epub.EpubBook()
 
-def scribble_book(url, title, author):
-	with open('book.txt', 'w', encoding='utf-8') as outp:
-			outp.close()
-	soup = BeautifulSoup(scraper.get(BeautifulSoup(scraper.get(url).text, 'html5lib').find('a', class_="toc_a")['href']).text, 'html5lib')
-	#return soup
-	while True:
+    book.set_identifier(key)
+    book.set_title(title)
+    book.set_language('en')
+    book.add_author(author)
+    book.add_metadata('DC', 'publisher', 'Scribble Hub')
+    book.add_metadata('DC', 'description', description)
+    book.add_metadata('DC', 'date', str(datetime.now().isoformat()))
 
-		chapter = soup.find('div', class_="chapter-title").text
-		soup_find = soup.find('div', id="chp_contents")
+    for x in tags:
+        book.add_metadata('DC', 'subject', x)
 
-		decompose('div', "ta_c_bm", soup_find)
-		decompose('div', "prenext", soup_find)
-		decompose('div', "pollend", soup_find)
-		decompose('div', "pollstart", soup_find)
-		decompose('div', "pResult", soup_find)
-		decompose('li', "p_pvote", soup_find)
-		decompose('div', "wi_authornotes", soup_find)
-		decompose('div', "wi_news", soup_find)
+    book.add_metadata('DC', 'identifier', toc)
 
-		content = str(soup_find).replace('</div></div>', '').replace('<div id="chp_contents"><div class="chp_raw" id="chp_raw">', '').replace('<p> </p>', '').replace('<p></p>', '')
+    Image.open(scraper.get(image, stream = True).raw).save('image.png')
+    book.set_cover("image.png", open('image.png', 'rb').read())
 
-		with open("book.txt", 'r+', encoding='utf-8') as outp:
-			old = outp.read()
-			outp.seek(0)
-			outp.truncate()
-			outp.write("\n# " + chapter + "\n")
-			outp.write('\n' + content + '\n')
-			outp.write(old)
-		outp.close()
-		print(' ' + chapter)
+    page = BeautifulSoup(scraper.get(chapter_url).text, 'html5lib')
 
-		if soup.find('a', title="Shortcut: [Ctrl] + [<-]")['href'] == '#':
-			break
+    page_list = []
 
-		soup = BeautifulSoup(scraper.get(soup.find('a', class_="btn-wi btn-prev")['href']).text, 'html5lib')
+    while True:
 
-	os.system('pandoc book.txt metadata.txt -s -o ' + '"' + title.replace('?','').replace(':','') + " - " + author + '.epub"')
-	os.system('rclone copy' + ' "' + title.replace('?','').replace(':','') + " - " + author + '.epub" GoogleDrive:"Backup/E-Books/Scribble Hub"')
-	os.remove("metadata.txt")
-	os.remove("image.png")
-	os.remove("book.txt")
-	os.remove(title.replace('?','').replace(':','') + " - " + author + '.epub')
+        #for summary in page.find_all('div', class_=re.compile('^sp-head')):
+            #summary.name = 'summary'
 
-	return BeautifulSoup(scraper.get(url).text, 'html5lib').find('a', class_="toc_a")['href']
+        #for details in page.find_all('div', class_=re.compile('sp-wrap')):
+            #details.name = 'details'
+
+        chapter = page.find('div', class_="chapter-title").text
+        content = page.find('div', id="chp_raw")
+        page_list.insert(0, [chapter, content])
+        print(chapter)
+        if page.find('a', title="Shortcut: [Ctrl] + [<-]")['href'] == '#':
+            break
+        chapter_url = page.find('a', class_="btn-wi btn-prev")['href']
+        page = BeautifulSoup(scraper.get(chapter_url).text, 'html5lib')
+
+    return create_epub(page_list, title, author, key, book, tags)
+
+def create_epub(page_list, title, author, key, books, tags):
+    chapter = epub.EpubHtml(title='Table of Content', file_name='toc.xhtml', lang='en')
+    css = epub.EpubItem(uid="style", file_name="style/style.css", media_type="text/css", content=style)
+
+    books.add_item(css)
+    books.add_item(chapter)
+
+    for chapters in page_list:
+        chapter = epub.EpubHtml(
+            title=chapters[0], file_name=key+str(page_list.index(chapters)) + '.xhtml', lang='en')
+        chapter.add_item(css)
+        chapter.content = '<h1>'+chapters[0]+'</h1>' + str(chapters[1])
+        books.add_item(chapter)
+        books.spine.append(chapter)
+        books.toc.append(epub.Link(key+str(page_list.index(chapters)) + '.xhtml', chapters[0], key+str(page_list.index(chapters))))
+
+    books.spine.insert(0, 'nav')
+    books.spine.insert(0, 'cover')
+    books.add_item(epub.EpubNcx())
+
+    file_name = title.replace('?', '').replace(':', '') + " - " + author.replace('?', '').replace(':', '') + '.epub'
+
+    epub.write_epub(file_name, books)
+    os.system('calibredb add -m overwrite --library-path "http://localhost:8082/#Calibre" "' + file_name + '"')
+    #os.system('rclone copy' + ' "' + file_name + '" GoogleDrive:"Backup/E-Books/Scribble Hub"')
+    os.remove(file_name)
+    os.remove("image.png")
+
+    return ', '.join([item[0] for item in page_list])
