@@ -51,7 +51,7 @@ def phone_alert(first, second, third, trigger):
 	requests.post("https://maker.ifttt.com/trigger/" + trigger + "/with/key/c8iEn74t0TTTI8JGSmqES", data=report)    
 
 def discord_alert(title, author, image, chapter, auth_image, auth_url, toc):
-	webhook = DiscordWebhook(url='https://discord.com/api/webhooks/951217607900557352/1kDc0xW4Rv9b9elXvht4ivMMiKh7qJQfSv8i7fl8H_5L6YYIpN93o_2PqgU84FvBy7Pb')
+	webhook = DiscordWebhook(url='webhook')
 	embed = DiscordEmbed(title=title, description = chapter, url = toc , color='03b2f8')
 	embed.set_author(name=author, url = auth_url, icon_url=auth_image)
 	embed.set_thumbnail(url=image)
