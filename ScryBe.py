@@ -40,7 +40,7 @@ def scribble_update(source, toc, key, chapter, title, chapter_url):
 
 ScribbleHub = feedparser.parse("https://www.scribblehub.com/rssfeed.php?type=local&uid=7608&unq=5ca19726c44b8&lid=0")
 
-for article in range(0,1):
+for article in range(0,25):
 
 	title = ScribbleHub.entries[article].category
 	chapter_url = ScribbleHub.entries[article].link

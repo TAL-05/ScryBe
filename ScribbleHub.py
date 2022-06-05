@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from Functions import edit_json
 from ebooklib import epub
+import subprocess
 from PIL import Image
 from datetime import datetime
 import cloudscraper
@@ -21,6 +22,7 @@ def scribble_book(toc, title, author, key, chapter_url, image, tags, description
     book.set_language('en')
     book.add_author(author)
     book.add_metadata('DC', 'publisher', 'Scribble Hub')
+    book.add_metadata('DC', 'identifier', 'url:' + toc)
     book.add_metadata('DC', 'description', description)
     book.add_metadata('DC', 'date', str(datetime.now().isoformat()))
 
@@ -78,9 +80,12 @@ def create_epub(page_list, title, author, key, books, tags):
     file_name = title.replace('?', '').replace(':', '') + " - " + author.replace('?', '').replace(':', '') + '.epub'
 
     epub.write_epub(file_name, books)
-    os.system('calibredb add -m overwrite --library-path "http://localhost:8082/#Calibre" "' + file_name + '"')
-    #os.system('rclone copy' + ' "' + file_name + '" GoogleDrive:"Backup/E-Books/Scribble Hub"')
+    os.system('ebook-meta "' + file_name + '" --to-opf metadata.opf')
+    book_id = subprocess.check_output('calibredb add -m overwrite "' + file_name + '" --library-path "http://localhost:8083/#Calibre_Library" --username TAL-05 --password 2CooL123', shell=True).decode("utf-8") 
+    print(re.findall("\d+", book_id)[0])
+    os.system('calibredb set_metadata ' + re.findall("\d+", book_id)[0] + ' metadata.opf --library-path "http://localhost:8083/#Calibre_Library" --username TAL-05 --password 2CooL123')
     os.remove(file_name)
+    os.remove("metadata.opf")
     os.remove("image.png")
 
     return ', '.join([item[0] for item in page_list])
