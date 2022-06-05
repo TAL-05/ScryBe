@@ -36,7 +36,7 @@ def scribble_update(source, toc, key, chapter, title, chapter_url):
 		edit_json(source, key, 'toc', toc)
 		
 		discord_alert(title, author, image, chapter, auth_image, auth_url, toc)
-		#phone_alert(title, chapter, chapter_url, 'epub_created')
+		phone_alert(title, chapter, chapter_url, 'epub_created')
 
 ScribbleHub = feedparser.parse("rssfeedurl")
 
