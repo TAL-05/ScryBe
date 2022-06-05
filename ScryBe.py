@@ -38,7 +38,7 @@ def scribble_update(source, toc, key, chapter, title, chapter_url):
 		discord_alert(title, author, image, chapter, auth_image, auth_url, toc)
 		#phone_alert(title, chapter, chapter_url, 'epub_created')
 
-ScribbleHub = feedparser.parse("https://www.scribblehub.com/rssfeed.php?type=local&uid=7608&unq=5ca19726c44b8&lid=0")
+ScribbleHub = feedparser.parse("rssfeedurl")
 
 for article in range(0,25):
 
